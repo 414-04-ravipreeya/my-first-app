@@ -48,15 +48,15 @@ def show_result_dialog():
     else:
         st.error(f"❌ ข้อ 2: ยังไม่ถูกต้อง (คุณตอบ '{u_ans2}')")
 
-    # ตรวจข้อ 3 (เพิ่มใหม่)
+    # ตรวจข้อ 3
     if u_ans3 == "banana":
         st.success("✅ ข้อ 3: ถูกต้อง")
         score += 1
     else:
         st.error(f"❌ ข้อ 3: ยังไม่ถูกต้อง (คุณตอบ '{u_ans3}')")
 
-    # ตรวจข้อ 4 (เพิ่มใหม่)
-    if u_ans4 == "Scissors":
+    # ตรวจข้อ 4 (แก้ไขเป็น scissors)
+    if u_ans4 == "scissors":
         st.success("✅ ข้อ 4: ถูกต้อง")
         score += 1
     else:
@@ -102,15 +102,15 @@ st.text_input(
     disabled=st.session_state.is_ended or st.session_state.start is None,
 )
 
-# คำศัพท์ที่เพิ่มใหม่
 st.text_input(
     "ข้อ 3: Monkeys love to eat `b _ n _ n a`. 🍌",
     key="ans3",
     disabled=st.session_state.is_ended or st.session_state.start is None,
 )
 
+# แก้ไขโจทย์ข้อ 4
 st.text_input(
-    "ข้อ 4: A `S c _ s s _ r s ` is Used to cut paper. ✂️ ",
+    "ข้อ 4: `s c _ s s _ r s` are used to cut paper. ✂️",
     key="ans4",
     disabled=st.session_state.is_ended or st.session_state.start is None,
 )
