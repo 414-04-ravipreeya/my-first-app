@@ -110,7 +110,7 @@ st.text_input(
 )
 
 st.text_input(
-    "ข้อ 4: A `m _ n k e y` is swinging on the tree. 🐒",
+    "ข้อ 4: A `S c _ s s _ r s ` is Used to cut paper. ✂️ ",
     key="ans4",
     disabled=st.session_state.is_ended or st.session_state.start is None,
 )
