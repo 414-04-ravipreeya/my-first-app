@@ -1,13 +1,13 @@
 import streamlit as st
 
 menu_data = [
-    {"id": 1, "name": "Latte☕", "price": 55},
-    {"id": 2, "name": "Flat White🥛", "price": 60},
-    {"id": 3, "name": "Popcorn Latte🍿", "price": 65},
-    {"id": 4, "name": "Americano🫗", "price": 50},
-    {"id": 5, "name": "Tiramisu🍰", "price": 85},
-    {"id": 6, "name": "Banoffee Pie🥧", "price": 75},
-    {"id": 7, "name": "Blueberry Cake🧁", "price": 80},
+    {"id": 1, "name": "Latte", "price": 55},
+    {"id": 2, "name": "Flat White", "price": 60},
+    {"id": 3, "name": "Popcorn Latte", "price": 65},
+    {"id": 4, "name": "Americano", "price": 50},
+    {"id": 5, "name": "Tiramisu", "price": 85},
+    {"id": 6, "name": "Banoffee Pie", "price": 75},
+    {"id": 7, "name": "Blueberry Cake", "price": 80},
 ]
 
 if "cart" not in st.session_state:
@@ -22,10 +22,20 @@ for item in menu_data:
     item_id = item["id"]
     qty = st.session_state.cart.get(item_id, 0)
 
-    col_name, col_minus, col_qty, col_plus = st.columns([5, 1, 1, 1])
+    # ปรับลำดับคอลัมน์: ชื่อเมนู | ปุ่ม + | ตัวเลข | ปุ่ม -
+    col_name, col_plus, col_qty, col_minus = st.columns([5, 1, 1, 1])
 
     with col_name:
         st.write(f"**{item['name']}** ({item['price']} บาท)")
+
+    with col_plus:
+        if st.button("➕", key=f"add_{item_id}", use_container_width=True):
+            st.session_state.cart[item_id] = qty + 1
+            st.session_state.order_confirmed = False
+            st.rerun()
+
+    with col_qty:
+        st.markdown(f"<div style='text-align: center; font-weight: bold; line-height: 2.2;'>{qty}</div>", unsafe_allow_html=True)
 
     with col_minus:
         if st.button("➖", key=f"sub_{item_id}", use_container_width=True):
@@ -36,21 +46,12 @@ for item in menu_data:
                 st.session_state.order_confirmed = False
                 st.rerun()
 
-    with col_qty:
-        st.markdown(f"<div style='text-align: center; font-weight: bold; line-height: 2.2;'>{qty}</div>", unsafe_allow_html=True)
-
-    with col_plus:
-        if st.button("➕", key=f"add_{item_id}", use_container_width=True):
-            st.session_state.cart[item_id] = qty + 1
-            st.session_state.order_confirmed = False
-            st.rerun()
-
 st.divider()
 
 temp_total = sum(item["price"] * st.session_state.cart[item["id"]] for item in menu_data if item["id"] in st.session_state.cart)
 
 if temp_total > 0:
-    st.write(f"### ราคารวมเบื้องต้น: **{temp_total}** บาท")
+    st.write(f"### Total : **{temp_total}** บาท")
     
     if st.button("✅ ยืนยันรายการอาหาร", type="primary", use_container_width=True):
         st.session_state.order_confirmed = True
