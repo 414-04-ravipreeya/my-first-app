@@ -1,61 +1,61 @@
-<div id="receipt">
-    <h3>🧾 บิลใบเสร็จรับเงิน</h3>
-    <div id="receipt-details"></div>
-    <hr>
-    <h4>ยอดรวมสุทธิ: <span id="receipt-total">0</span> บาท</h4>
-    <p><i>ขอบคุณที่อุดหนุนค่ะ!</i></p>
-</div>
+import streamlit as st
 
+# 1. ข้อมูลเมนู
+menu_data = [
+    {"id": 1, "name": "Latte", "price": 55},
+    {"id": 2, "name": "Flat White", "price": 60},
+    {"id": 3, "name": "Popcorn Latte", "price": 65},
+    {"id": 4, "name": "Americano", "price": 50},
+    {"id": 5, "name": "Tiramisu", "price": 85},
+    {"id": 6, "name": "Banoffee Pie", "price": 75},
+    {"id": 7, "name": "Blueberry Cake", "price": 80},
+]
 
-const menuData = [
-    { id: 1, name: 'Latte', price: 55 },
-    { id: 2, name: 'Flat White', price: 60 },
-    { id: 3, name: 'Popcorn Latte', price: 65 },
-    { id: 4, name: 'Americano', price: 50 },
-    { id: 5, name: 'Tiramisu', price: 85 },
-    { id: 6, name: 'Banoffee Pie', price: 75 },
-    { id: 7, name: 'Blueberry Cake', price: 80 }
-];
+# 2. ตัวแปรเก็บตะกร้าสินค้าใน Session State ของ Streamlit
+if "cart" not in st.session_state:
+    st.session_state.cart = {}
 
-let cart = {}; // เก็บรายการที่เลือก { id: quantity }
+st.title("☕ ร้านกาแฟ Super Shop")
 
-function updateCart(itemId, change) {
-    cart[itemId] = (cart[itemId] || 0) + change;
+# 3. แสดงรายการเมนูให้กดสั่งซื้อ
+st.subheader("📋 รายการเมนู")
+for item in menu_data:
+    col1, col2, col3 = st.columns([3, 2, 2])
+    with col1:
+        st.write(f"**{item['name']}** ({item['price']} บาท)")
+    with col2:
+        if st.button("➕ เพิ่ม", key=f"add_{item['id']}"):
+            st.session_state.cart[item['id']] = st.session_state.cart.get(item['id'], 0) + 1
+            st.rerun()
+    with col3:
+        if st.button("➖ ลด", key=f"remove_{item['id']}"):
+            if item['id'] in st.session_state.cart:
+                st.session_state.cart[item['id']] -= 1
+                if st.session_state.cart[item['id']] <= 0:
+                    del st.session_state.cart[item['id']]
+                st.rerun()
+
+st.divider()
+
+# 4. ส่วนของใบเสร็จรับเงิน (แทนที่ HTML เดิม)
+st.subheader("🧾 บิลใบเสร็จรับเงิน")
+
+total_price = 0
+has_items = False
+
+for item in menu_data:
+    item_id = item["id"]
+    if item_id in st.session_state.cart and st.session_state.cart[item_id] > 0:
+        qty = st.session_state.cart[item_id]
+        subtotal = qty * item["price"]
+        total_price += subtotal
+        st.write(f"{item['name']} x {qty} = {subtotal} บาท")
+        has_items = True
+
+if not has_items:
+    st.info("ยังไม่มีรายการที่เลือก")
+else:
+    st.divider()
+    st.markdown(f"### ยอดรวมสุทธิ: **{total_price}** บาท")
+    st.caption("ขอบคุณที่อุดหนุนค่ะ!")
     
-    // ถ้าจำนวนลดลงจนเหลือ 0 หรือติดลบ ให้ลบออกจาก cart
-    if (cart[itemId] <= 0) {
-        delete cart[itemId];
-    }
-    
-    renderMenu(); // อย่าลืมสร้างฟังก์ชัน renderMenu() และ renderReceipt()
-    renderReceipt(); 
-}
-
-function calculateTotal() {
-    let total = 0;
-    menuData.forEach(item => {
-        if (cart[item.id]) {
-            total += cart[item.id] * item.price;
-        }
-    });
-    return total; // คืนค่า total ออกไปใช้งาน
-}
-
-// ฟังก์ชันสำหรับอัปเดตหน้าใบเสร็จ
-function renderReceipt() {
-    const detailsContainer = document.getElementById('receipt-details');
-    const totalContainer = document.getElementById('receipt-total');
-    
-    let detailsHTML = '';
-    
-    menuData.forEach(item => {
-        if (cart[item.id]) {
-            const itemTotal = cart[item.id] * item.price;
-            detailsHTML += `<p>${item.name} x ${cart[item.id]} = ${itemTotal} บาท</p>`;
-        }
-    });
-    
-    detailsContainer.innerHTML = detailsHTML || '<p>ยังไม่มีรายการที่เลือก</p>';
-    totalContainer.innerText = calculateTotal();
-}
-
