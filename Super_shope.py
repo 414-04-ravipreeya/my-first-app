@@ -1,13 +1,13 @@
 import streamlit as st
 
 menu = [
-    {"id": 1, "name": "Latte", "price": 55},
-    {"id": 2, "name": "Flat White", "price": 60},
-    {"id": 3, "name": "Popcorn Latte", "price": 65},
-    {"id": 4, "name": "Americano", "price": 50},
-    {"id": 5, "name": "Tiramisu", "price": 85},
-    {"id": 6, "name": "Banoffee Pie", "price": 75},
-    {"id": 7, "name": "Blueberry Cake", "price": 80},
+    {"id": 1, "name": "Latte☕", "price": 65},
+    {"id": 2, "name": "Flat white🥛", "price": 65},
+    {"id": 3, "name": "Popcorn Latte🍿", "price": 70},
+    {"id": 4, "name": "Americano🫗", "price": 60},
+    {"id": 5, "name": "Tiramisu🍰", "price": 45},
+    {"id": 6, "name": "Banoffee Pie🥧", "price": 40},
+    {"id": 7, "name": "Blueberry Cake🧁", "price": 40},
 ]
 
 if "cart" not in st.session_state:
@@ -27,7 +27,7 @@ def show_receipt(selected_items, total_price):
         st.session_state.cart = {} # ล้างตะกร้าเมื่อปิดบิล
         st.rerun()
 
-st.title("☕ ร้านกาแฟ Super Shop")
+st.title("☕ ร้านกาแฟ Super Shop🍰☕")
 st.subheader("📋 รายการเมนู")
 
 # 1. แสดงรายการเมนู
