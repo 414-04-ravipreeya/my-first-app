@@ -27,7 +27,7 @@ def show_receipt(selected_items, total_price):
         st.session_state.cart = {} # ล้างตะกร้าเมื่อปิดบิล
         st.rerun()
 
-st.title("☕ ร้านกาแฟ Super Shop🍰☕")
+st.title("☕ cafe super shop🍰☕")
 st.subheader("📋 รายการเมนู")
 
 # 1. แสดงรายการเมนู
