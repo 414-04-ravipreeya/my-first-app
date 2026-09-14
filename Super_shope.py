@@ -162,10 +162,20 @@ elif st.session_state.step == "receipt":
     show_receipt(selected_items, total_price)
 
 # -------------------------------------------------------------
-# 📊 ส่วนแสดงตารางข้อมูลสมาชิก (สำหรับเจ้าของร้านตรวจสอบด้านล่าง)
+# 🔐 ส่วนแสดงตารางข้อมูลสมาชิก (ปลดล็อกด้วยรหัสผ่าน 1047)
 # -------------------------------------------------------------
-if st.session_state.members_db:
-    st.write("---")
-    with st.expander("📊 รายชื่อสมาชิกและยอดสั่งซื้อสะสม (สำหรับเจ้าของร้าน)"):
-        for phone, total in st.session_state.members_db.items():
-            st.write(f"📱 เบอร์: `{phone}` | 💵 ยอดสะสมทั้งหมด: **{total}** บาท")
+st.write("---")
+with st.expander("🔐 สำหรับเจ้าของร้าน (ตรวจสอบข้อมูลสมาชิก)"):
+    password = st.text_input("กรุณาใส่รหัสผ่านผ่านเข้าสู่ระบบ", type="password", key="owner_pass")
+    
+    if password == "1047":
+        st.success("🔓 รหัสผ่านถูกต้อง")
+        if st.session_state.members_db:
+            st.markdown("### 📊 รายชื่อสมาชิกและยอดสั่งซื้อสะสม")
+            for phone, total in st.session_state.members_db.items():
+                st.write(f"📱 เบอร์: `{phone}` | 💵 ยอดสะสมทั้งหมด: **{total}** บาท")
+        else:
+            st.info("ยังไม่มีข้อมูลสมาชิกในระบบ")
+    elif password != "":
+        st.error("❌ รหัสผ่านไม่ถูกต้อง")
+    
