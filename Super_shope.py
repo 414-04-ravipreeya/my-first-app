@@ -194,7 +194,7 @@ with st.expander("🔐 สำหรับเจ้าของร้าน (ต�
     else:
         st.success("🔓 เข้าสู่ระบบเจ้าของร้านสำเร็จ")
         if st.session_state.members_db:
-            st.markdown("### 📊 รายชื่อสมาชิกและยอดสั่งซื้อสะสม")
+            st.markdown("###  รายชื่อสมาชิกและยอดสั่งซื้อสะสม")
             for phone, total in st.session_state.members_db.items():
                 st.write(f" เบอร์: `{phone}` |  ยอดสะสมทั้งหมด: **{total}** บาท")
         else:
