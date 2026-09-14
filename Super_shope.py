@@ -1,4 +1,4 @@
-        import streamlit as st
+import streamlit as st
 
 menu = [
     {"id": 1, "name": "Latte☕", "price": 65},
@@ -18,7 +18,7 @@ if "step" not in st.session_state:
 if "current_phone" not in st.session_state:
     st.session_state.current_phone = None
 
-# 💡 ฐานข้อมูลจำลองสำหรับเก็บข้อมูลสมาชิก { "เบอร์โทร": ยอดสะสม }
+# ฐานข้อมูลจำลองสำหรับเก็บข้อมูลสมาชิก { "เบอร์โทร": ยอดสะสม }
 if "members_db" not in st.session_state:
     st.session_state.members_db = {}
 
@@ -169,4 +169,3 @@ if st.session_state.members_db:
     with st.expander("📊 รายชื่อสมาชิกและยอดสั่งซื้อสะสม (สำหรับเจ้าของร้าน)"):
         for phone, total in st.session_state.members_db.items():
             st.write(f"📱 เบอร์: `{phone}` | 💵 ยอดสะสมทั้งหมด: **{total}** บาท")
-            
