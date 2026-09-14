@@ -108,7 +108,7 @@ def show_member_dialog():
                 st.error("❌ กรุณาใส่เบอร์โทรศัพท์ให้ครบ 10 หลัก (เฉพาะตัวเลข)")
 
     with col_cancel:
-        if st.button("ข้าม / ไม่ใช้สมาชิก", use_container_width=True):
+        if st.button("ไม่สมัครสมาชิก", use_container_width=True):
             # ตั้งค่าให้เบอร์โทรเป็น None เพื่อออกบิลลูกค้าธรรมดา
             st.session_state.current_phone = None
             st.session_state.step = "receipt"
