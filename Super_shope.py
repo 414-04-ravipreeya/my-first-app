@@ -20,6 +20,12 @@ if "current_phone" not in st.session_state:
 if "owner_logged_in" not in st.session_state:
     st.session_state.owner_logged_in = False
 
+# บันทึกข้อมูลตะกร้าชั่วคราวขณะออกบิล
+if "checkout_items" not in st.session_state:
+    st.session_state.checkout_items = []
+if "checkout_total" not in st.session_state:
+    st.session_state.checkout_total = 0
+
 # ฐานข้อมูลจำลองสำหรับเก็บข้อมูลสมาชิก { "เบอร์โทร": ยอดสะสม }
 if "members_db" not in st.session_state:
     st.session_state.members_db = {}
@@ -27,17 +33,19 @@ if "members_db" not in st.session_state:
 
 # ฟังก์ชันหน้าต่างบิลใบเสร็จ
 @st.dialog("🧾 บิลใบเสร็จรับเงิน")
-def show_receipt(selected_items, total_price):
+def show_receipt():
     phone = st.session_state.current_phone
+    selected_items = st.session_state.checkout_items
+    total_price = st.session_state.checkout_total
 
-    if phone:
+    if phone and phone in st.session_state.members_db:
         accumulated_total = st.session_state.members_db[phone]
         st.success(f"📱 เบอร์สมาชิก: **{phone}**")
         st.info(
             f"💰 ยอดซื้อครั้งนี้: **{total_price}** บาท | 📊 ยอดสั่งซื้อสะสมทั้งหมด: **{accumulated_total}** บาท"
         )
     else:
-        st.caption("ลูกค้าทั่วไป (ไม่ได้ใช้ระบบสมาชิก)")
+        st.write("👤 **ลูกค้าทั่วไป (ไม่ได้ใช้ระบบสมาชิก)**")
 
     st.divider()
     for item in selected_items:
@@ -54,6 +62,8 @@ def show_receipt(selected_items, total_price):
 
     if st.button("ปิดหน้าต่าง / สั่งซื้อใหม่", use_container_width=True):
         st.session_state.cart = {}
+        st.session_state.checkout_items = []
+        st.session_state.checkout_total = 0
         st.session_state.step = "cart"
         st.session_state.current_phone = None
         st.rerun()
@@ -61,7 +71,9 @@ def show_receipt(selected_items, total_price):
 
 # ฟังก์ชัน Popup สมัคร/เข้าสู่ระบบสมาชิก
 @st.dialog("👤 ระบบสมาชิก")
-def show_member_dialog(selected_items, total_price):
+def show_member_dialog():
+    total_price = st.session_state.checkout_total
+
     st.write("กรอกเบอร์โทรศัพท์เพื่อสะสมยอดซื้อ")
     st.caption("📌 **เงื่อนไข:** ซื้อครบ 350 บาท แถมน้ำราคา 65 บาท 1 แก้ว")
 
@@ -97,6 +109,7 @@ def show_member_dialog(selected_items, total_price):
 
     with col_cancel:
         if st.button("ข้าม / ไม่ใช้สมาชิก", use_container_width=True):
+            # ตั้งค่าให้เบอร์โทรเป็น None เพื่อออกบิลลูกค้าธรรมดา
             st.session_state.current_phone = None
             st.session_state.step = "receipt"
             st.rerun()
@@ -152,6 +165,9 @@ if selected_items:
     st.markdown(f"## Total : **{total_price}** บาท")
 
     if st.button("✅ ยืนยันเมนู", type="primary", use_container_width=True):
+        # บันทึกข้อมูลเข้า Session State ก่อนเปลี่ยนหน้า Popup
+        st.session_state.checkout_items = selected_items
+        st.session_state.checkout_total = total_price
         st.session_state.step = "member_ask"
         st.rerun()
 else:
@@ -159,9 +175,9 @@ else:
 
 # แสดงผล Popup ตามสถานะ
 if st.session_state.step == "member_ask":
-    show_member_dialog(selected_items, total_price)
+    show_member_dialog()
 elif st.session_state.step == "receipt":
-    show_receipt(selected_items, total_price)
+    show_receipt()
 
 # -------------------------------------------------------------
 # 🔐 ส่วนแสดงตารางข้อมูลสมาชิก (มีปุ่มยืนยันรหัส)
@@ -188,4 +204,4 @@ with st.expander("🔐 สำหรับเจ้าของร้าน (ต�
         if st.button("🔒 ออกจากระบบเจ้าของร้าน", use_container_width=True):
             st.session_state.owner_logged_in = False
             st.rerun()
-            
+    
