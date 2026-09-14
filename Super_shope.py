@@ -185,7 +185,7 @@ st.write("---")
 with st.expander("🔐 สำหรับเจ้าของร้าน (ตรวจสอบข้อมูลสมาชิก)"):
     if not st.session_state.owner_logged_in:
         password_input = st.text_input("กรุณากรอกรหัสผ่าน", type="password", key="owner_pass_input")
-        if st.button("🔑 ยืนยันรหัส", use_container_width=True):
+        if st.button(" ยืนยันรหัส", use_container_width=True):
             if password_input == "1047":
                 st.session_state.owner_logged_in = True
                 st.rerun()
