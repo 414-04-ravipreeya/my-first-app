@@ -41,9 +41,9 @@ def show_receipt():
     # แสดงเฉพาะกรณีที่เป็นสมาชิก
     if phone and phone in st.session_state.members_db:
         accumulated_total = st.session_state.members_db[phone]
-        st.success(f"📱 เบอร์สมาชิก: **{phone}**")
+        st.success(f" เบอร์สมาชิก: **{phone}**")
         st.info(
-            f"💰 ยอดซื้อครั้งนี้: **{total_price}** บาท | 📊 ยอดสั่งซื้อสะสมทั้งหมด: **{accumulated_total}** บาท"
+            f" ยอดซื้อครั้งนี้: **{total_price}** บาท |  ยอดสั่งซื้อสะสมทั้งหมด: **{accumulated_total}** บาท"
         )
         st.divider()
 
