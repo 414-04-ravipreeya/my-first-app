@@ -1,4 +1,4 @@
-    import streamlit as st
+        import streamlit as st
 
 menu = [
     {"id": 1, "name": "Latte☕", "price": 65},
@@ -50,7 +50,7 @@ def show_receipt(selected_items, total_price):
     st.markdown(f"### ยอดรวมสุทธิ: **{total_price}** บาท")
     st.caption("ขอบคุณที่อุดหนุนค่ะ! 🙏")
 
-    if st.button("เสร็จสิ้น / สั่งซื้อใหม่", use_container_width=True):
+    if st.button("ปิดหน้าต่าง / สั่งซื้อใหม่", use_container_width=True):
         st.session_state.cart = {}
         st.session_state.step = "cart"
         st.session_state.current_phone = None
@@ -94,7 +94,7 @@ def show_member_dialog(selected_items, total_price):
                 st.error("❌ กรุณาใส่เบอร์โทรศัพท์ให้ครบ 10 หลัก (เฉพาะตัวเลข)")
 
     with col_cancel:
-        if st.button("ข้าม", use_container_width=True):
+        if st.button("ข้าม / ไม่ใช้สมาชิก", use_container_width=True):
             st.session_state.current_phone = None
             st.session_state.step = "receipt"
             st.rerun()
