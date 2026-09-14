@@ -17,6 +17,8 @@ if "step" not in st.session_state:
     st.session_state.step = "cart"
 if "current_phone" not in st.session_state:
     st.session_state.current_phone = None
+if "owner_logged_in" not in st.session_state:
+    st.session_state.owner_logged_in = False
 
 # ฐานข้อมูลจำลองสำหรับเก็บข้อมูลสมาชิก { "เบอร์โทร": ยอดสะสม }
 if "members_db" not in st.session_state:
@@ -162,20 +164,28 @@ elif st.session_state.step == "receipt":
     show_receipt(selected_items, total_price)
 
 # -------------------------------------------------------------
-# 🔐 ส่วนแสดงตารางข้อมูลสมาชิก (ปลดล็อกด้วยรหัสผ่าน 1047)
+# 🔐 ส่วนแสดงตารางข้อมูลสมาชิก (มีปุ่มยืนยันรหัส)
 # -------------------------------------------------------------
 st.write("---")
 with st.expander("🔐 สำหรับเจ้าของร้าน (ตรวจสอบข้อมูลสมาชิก)"):
-    password = st.text_input("กรุณาใส่รหัสผ่านผ่านเข้าสู่ระบบ", type="password", key="owner_pass")
-    
-    if password == "1047":
-        st.success("🔓 รหัสผ่านถูกต้อง")
+    if not st.session_state.owner_logged_in:
+        password_input = st.text_input("กรุณากรอกรหัสผ่าน", type="password", key="owner_pass_input")
+        if st.button("🔑 ยืนยันรหัส", use_container_width=True):
+            if password_input == "1047":
+                st.session_state.owner_logged_in = True
+                st.rerun()
+            else:
+                st.error("❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง")
+    else:
+        st.success("🔓 เข้าสู่ระบบเจ้าของร้านสำเร็จ")
         if st.session_state.members_db:
             st.markdown("### 📊 รายชื่อสมาชิกและยอดสั่งซื้อสะสม")
             for phone, total in st.session_state.members_db.items():
                 st.write(f"📱 เบอร์: `{phone}` | 💵 ยอดสะสมทั้งหมด: **{total}** บาท")
         else:
             st.info("ยังไม่มีข้อมูลสมาชิกในระบบ")
-    elif password != "":
-        st.error("❌ รหัสผ่านไม่ถูกต้อง")
-    
+        
+        if st.button("🔒 ออกจากระบบเจ้าของร้าน", use_container_width=True):
+            st.session_state.owner_logged_in = False
+            st.rerun()
+            
