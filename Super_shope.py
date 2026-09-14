@@ -196,7 +196,7 @@ with st.expander("🔐 สำหรับเจ้าของร้าน (ต�
         if st.session_state.members_db:
             st.markdown("### 📊 รายชื่อสมาชิกและยอดสั่งซื้อสะสม")
             for phone, total in st.session_state.members_db.items():
-                st.write(f"📱 เบอร์: `{phone}` | 💵 ยอดสะสมทั้งหมด: **{total}** บาท")
+                st.write(f" เบอร์: `{phone}` |  ยอดสะสมทั้งหมด: **{total}** บาท")
         else:
             st.info("ยังไม่มีข้อมูลสมาชิกในระบบ")
         
