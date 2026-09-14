@@ -38,16 +38,15 @@ def show_receipt():
     selected_items = st.session_state.checkout_items
     total_price = st.session_state.checkout_total
 
+    # แสดงเฉพาะกรณีที่เป็นสมาชิก
     if phone and phone in st.session_state.members_db:
         accumulated_total = st.session_state.members_db[phone]
         st.success(f"📱 เบอร์สมาชิก: **{phone}**")
         st.info(
             f"💰 ยอดซื้อครั้งนี้: **{total_price}** บาท | 📊 ยอดสั่งซื้อสะสมทั้งหมด: **{accumulated_total}** บาท"
         )
-    else:
-        st.write("👤 **ลูกค้าทั่วไป (ไม่ได้ใช้ระบบสมาชิก)**")
+        st.divider()
 
-    st.divider()
     for item in selected_items:
         st.write(
             f"• **{item['name']}** x {item['qty']} = {item['subtotal']} บาท"
@@ -204,4 +203,4 @@ with st.expander("🔐 สำหรับเจ้าของร้าน (ต�
         if st.button("🔒 ออกจากระบบเจ้าของร้าน", use_container_width=True):
             st.session_state.owner_logged_in = False
             st.rerun()
-    
+                
