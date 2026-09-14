@@ -1,5 +1,4 @@
-import re
-import streamlit as st
+    import streamlit as st
 
 menu = [
     {"id": 1, "name": "Latte☕", "price": 65},
@@ -11,27 +10,39 @@ menu = [
     {"id": 7, "name": "Blueberry Cake🧁", "price": 40},
 ]
 
-# กำหนด Session State สำหรับเก็บข้อมูล
+# 1. ระบบบันทึกข้อมูล Session State
 if "cart" not in st.session_state:
     st.session_state.cart = {}
 if "step" not in st.session_state:
-    st.session_state.step = "cart"  # สถาณะ: 'cart', 'member_ask', 'receipt'
-if "phone_number" not in st.session_state:
-    st.session_state.phone_number = None
+    st.session_state.step = "cart"
+if "current_phone" not in st.session_state:
+    st.session_state.current_phone = None
+
+# 💡 ฐานข้อมูลจำลองสำหรับเก็บข้อมูลสมาชิก { "เบอร์โทร": ยอดสะสม }
+if "members_db" not in st.session_state:
+    st.session_state.members_db = {}
 
 
-# ฟังก์ชันสร้างหน้าต่างบิลเด้งกลางหน้าจอ (Modal Dialog)
+# ฟังก์ชันหน้าต่างบิลใบเสร็จ
 @st.dialog("🧾 บิลใบเสร็จรับเงิน")
 def show_receipt(selected_items, total_price):
-    if st.session_state.phone_number:
-        st.success(f"📱 สมาชิก: {st.session_state.phone_number}")
+    phone = st.session_state.current_phone
 
+    if phone:
+        accumulated_total = st.session_state.members_db[phone]
+        st.success(f"📱 เบอร์สมาชิก: **{phone}**")
+        st.info(
+            f"💰 ยอดซื้อครั้งนี้: **{total_price}** บาท | 📊 ยอดสั่งซื้อสะสมทั้งหมด: **{accumulated_total}** บาท"
+        )
+    else:
+        st.caption("ลูกค้าทั่วไป (ไม่ได้ใช้ระบบสมาชิก)")
+
+    st.divider()
     for item in selected_items:
         st.write(
             f"• **{item['name']}** x {item['qty']} = {item['subtotal']} บาท"
         )
 
-    # เงื่อนไขโปรโมชัน: ซื้อครบ 350 แถมน้ำราคา 65 บาท 1 แก้ว
     if total_price >= 350:
         st.info("🎉 **โปรโมชันพิเศษ:** ซื้อครบ 350 บาท รับฟรี! เครื่องดื่มราคา 65 บาท 1 แก้ว")
 
@@ -39,17 +50,17 @@ def show_receipt(selected_items, total_price):
     st.markdown(f"### ยอดรวมสุทธิ: **{total_price}** บาท")
     st.caption("ขอบคุณที่อุดหนุนค่ะ! 🙏")
 
-    if st.button("ปิดหน้าต่าง / สั่งซื้อใหม่", use_container_width=True):
-        st.session_state.cart = {}  # ล้างตะกร้าเมื่อปิดบิล
+    if st.button("เสร็จสิ้น / สั่งซื้อใหม่", use_container_width=True):
+        st.session_state.cart = {}
         st.session_state.step = "cart"
-        st.session_state.phone_number = None
+        st.session_state.current_phone = None
         st.rerun()
 
 
-# ฟังก์ชัน Popup ถามการสมัครสมาชิก
-@st.dialog("👤 สมัครสมาชิก")
+# ฟังก์ชัน Popup สมัคร/เข้าสู่ระบบสมาชิก
+@st.dialog("👤 ระบบสมาชิก")
 def show_member_dialog(selected_items, total_price):
-    st.write("คุณต้องการสมัครสมาชิกเพื่อสะสมแต้มและรับสิทธิประโยชน์หรือไม่?")
+    st.write("กรอกเบอร์โทรศัพท์เพื่อสะสมยอดซื้อ")
     st.caption("📌 **เงื่อนไข:** ซื้อครบ 350 บาท แถมน้ำราคา 65 บาท 1 แก้ว")
 
     phone_input = st.text_input(
@@ -62,30 +73,38 @@ def show_member_dialog(selected_items, total_price):
 
     with col_confirm:
         if st.button("ยืนยัน", type="primary", use_container_width=True):
-            # ตรวจสอบว่าเป็นตัวเลขและมีความยาว 10 หลัก
             if (
                 phone_input
                 and len(phone_input) == 10
                 and phone_input.isdigit()
             ):
-                st.session_state.phone_number = phone_input
+                st.session_state.current_phone = phone_input
+
+                # บันทึกหรืออัปเดตยอดสั่งซื้อสะสมลงใน Database จำลอง
+                if phone_input not in st.session_state.members_db:
+                    st.session_state.members_db[phone_input] = total_price
+                    st.toast("สมัครสมาชิกสำเร็จ! 🎉", icon="✅")
+                else:
+                    st.session_state.members_db[phone_input] += total_price
+                    st.toast("สะสมยอดซื้อเรียบร้อย! 📈", icon="👍")
+
                 st.session_state.step = "receipt"
-                st.toast("สมัครสมาชิกสำเร็จ! 🎉", icon="✅")
                 st.rerun()
             else:
-                st.error("❌ มีข้อผิดพลาด: กรุณาใส่เบอร์โทรศัพท์ให้ครบ 10 หลัก (เฉพาะตัวเลข)")
+                st.error("❌ กรุณาใส่เบอร์โทรศัพท์ให้ครบ 10 หลัก (เฉพาะตัวเลข)")
 
     with col_cancel:
-        if st.button("ข้าม / ไม่สมัคร", use_container_width=True):
-            st.session_state.phone_number = None
+        if st.button("ข้าม", use_container_width=True):
+            st.session_state.current_phone = None
             st.session_state.step = "receipt"
             st.rerun()
 
 
+# หน้าจอหลัก UI
 st.title("☕ cafe super shop🍰☕")
 st.subheader("📋 รายการเมนู")
 
-# 1. แสดงรายการเมนู
+# แสดงรายการเมนู
 for item in menu:
     i_id, qty = item["id"], st.session_state.cart.get(item["id"], 0)
     col1, col2, col3, col4 = st.columns([5, 1, 1, 1])
@@ -111,7 +130,7 @@ for item in menu:
 
 st.divider()
 
-# 2. คำนวณสรุปรายการที่เลือก
+# คำนวณสรุปรายการที่เลือก
 selected_items = [
     {
         **item,
@@ -123,7 +142,6 @@ selected_items = [
 ]
 total_price = sum(item["subtotal"] for item in selected_items)
 
-# 3. แสดงสรุปรายการและปุ่มยืนยัน
 if selected_items:
     st.markdown("### 🛒 รายการที่เลือก")
     for item in selected_items:
@@ -137,9 +155,18 @@ if selected_items:
 else:
     st.info("กรุณาเลือกรายการอาหาร")
 
-# ควบคุมการแสดง Dialog ตามสถานะ Step
+# แสดงผล Popup ตามสถานะ
 if st.session_state.step == "member_ask":
     show_member_dialog(selected_items, total_price)
 elif st.session_state.step == "receipt":
     show_receipt(selected_items, total_price)
-    
+
+# -------------------------------------------------------------
+# 📊 ส่วนแสดงตารางข้อมูลสมาชิก (สำหรับเจ้าของร้านตรวจสอบด้านล่าง)
+# -------------------------------------------------------------
+if st.session_state.members_db:
+    st.write("---")
+    with st.expander("📊 รายชื่อสมาชิกและยอดสั่งซื้อสะสม (สำหรับเจ้าของร้าน)"):
+        for phone, total in st.session_state.members_db.items():
+            st.write(f"📱 เบอร์: `{phone}` | 💵 ยอดสะสมทั้งหมด: **{total}** บาท")
+            
